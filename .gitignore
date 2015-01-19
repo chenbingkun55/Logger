@@ -13,3 +13,6 @@ Debug/
 bin/
 obj/
 /Setup
+/Test
+*.p12
+*.pem

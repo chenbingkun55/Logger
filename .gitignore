@@ -16,3 +16,4 @@ obj/
 /Test
 *.p12
 *.pem
+*.pyc

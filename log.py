@@ -3,11 +3,10 @@ import sys
 
 sys.path.append('lib')
 import bigquery as db
-_db = None
 
 def init():
-    _db = db.create_engine()
+    return db.create_engine()
 
 
 
-init()
+_db = init()

@@ -1,56 +1,44 @@
 \_{*}+=
 import httplib2
-from apiclient.discovery import build
+import pprint
+import sys
+
+from googleapiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
-from xmlconfig import config
 
-class GoogleAPIFromServiceAccount(object):
-    """Stores API information for a Google service account."""
+C = config('./config/bigquery.xml').get_items()
 
-    def __init__(self, projectNumber, svcEmail, keyPath):
-        self.projectNumber = projectNumber
-        self.serviceAccountEmail = svcEmail
-        self.key = self.readKey(keyPath)
+key_file = C.get('KeyFile')
+client_mail = C.get('ClientMail')
+scope = C.get('Scope')
+projectId = C.get('ProjectId')
+datasetId = C.get('DatasetId)
+tableId = C.get('DatasetId)
 
-    def readKey(self, keyPath):
-        """Reads API private key stored at keyPath."""
-        try:
-            with open(keyPath, 'rb') as f:
-                key = f.read()
-            return key
-        except IOError, e:
-            print "Invalid key file specified: %d" % e
+def main(argv):
+  # Load the key in PKCS 12 format that you downloaded from the Google API
+  # Console when you created your Service account.
+  f = file(key_file, 'rb')
+  key = f.read()
+  f.close()
 
-class GoogleBigQuery(object):
-    """A basic Google BigQuery interface that lets you get results from arbitrary queries."""
+  # Create an httplib2.Http object to handle our HTTP requests and authorize it
+  # with the Credentials. Note that the first parameter, service_account_name,
+  # is the Email address created for the Service account. It must be the email
+  # address associated with the key that was created.
+  credentials = SignedJwtAssertionCredentials(client_mail,key,scope)
 
-    def __init__(self, api):
-        if ( isinstance(api, GoogleAPIFromServiceAccount) ):
-            self.api = api
-            self.scope = "https://www.googleapis.com/auth/bigquery"
-            self.service = None
-            self.authenticateService()
-        else:
-            raise Exception("The API object given was not valid and is of type %s." % type(api))
+  http_auth = credentials.authorize(httplib2.Http())
 
-    def authenticateService(self):
-        if ( self.service == None ):
-            credentials = SignedJwtAssertionCredentials(self.api.serviceAccountEmail, self.api.key, self.scope)
-            httpObject = credentials.authorize(httplib2.Http())
-            service = build('bigquery', 'v2', http=httpObject)
-            self.service = service
-        else:
-            return False
+  service = build("bigquery", "v2", http=http_auth)
 
-    def query(self, sql):
-        queryData = {'query': sql}
-        queryRequest = self.service.jobs()
-        queryResponse = queryRequest.query(projectId=self.api.projectNumber, body=queryData).execute()
-        return queryResponse
+  # List all the tasklists for the account.
+  response = service.tables().get(projectId=projectId,datasetId=datasetId,tableId=tableId).execute()
+  #lists = service.tasklists().list().execute(http=http)
+  #pprint.pprint(lists)
+  pprint.pprint(response)
 
-def create_engine():
-    C = config('./config/bigquery.xml').get_items()
-    API = GoogleAPIFromServiceAccount(C.get('ProjectId'), C.get('ClientMail'), C.get('KeyFile'))
-    bq = GoogleBigQuery(API)
-    return bq
+
+if __name__ == '__main__':
+  main(sys.argv)
 @>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
-    <item key="ProjectId" value="tet" />
-    <item key="ClientMail" value="test@13.com" />
+    <item key="ProjectId" value="nth-honor-819" />
+    <item key="ClientMail" value="790642131213-fnqf4v6r3useipq1595cm8qicmbe71vd@developer.gserviceaccount.com" />
     <item key="KeyFile" value="key.p12" />
+    <item key="Scope" value="https://www.googleapis.com/auth/bigquery" />
+    <item key="DatasetId" value="Temp" />
+    <item key="TableId" value="Account" />
 </config>
